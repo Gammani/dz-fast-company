@@ -1,31 +1,21 @@
-import React, {useState} from "react";
+import React, { useState } from 'react';
 import Users from "./components/users";
-import api from "./api";
-
+import SearchStatus from "./components/searchStatus";
+import api from "./api"
 
 function App() {
-    const usersApi = api.users.fetchAll();
-    const usersInit = usersApi.map(user => {
-        return {...user, status: false}
-    })
-
-    const [users, setUsers] = useState(usersInit);
-
-
+    const [users, setUsers] = useState(api.users.fetchAll());
     const handleDelete = (userId) => {
-        const usersCopy = users.filter(user => user._id !== userId);
-        setUsers(usersCopy);
+        setUsers(users.filter((user) => user._id !== userId));
     };
-
     const handleToggleBookMark = (id) => {
-        const usersCopy = users;
-        setUsers(usersCopy.map(user => user._id === id ? {
-            ...user,
-            status: user.status === false ? true : false
-        } : user));
-    };
-
-    const handlePhrase = (number) => {
+        setUsers(users.filter((user) => {
+            if (user._id === id) { user.bookmark = !user.bookmark; return user }
+            return user
+        }))
+        console.log(id)
+    }
+    const renderPhrase = (number) => {
         if (number === 0) {
             return `Никто с тобой не тусанет`
         }
@@ -42,15 +32,10 @@ function App() {
 
     return (
         <div>
-            <Users
-                users={users} setUsers={setUsers}
-                onChangeStatus={handleToggleBookMark}
-                handleToggleBookMark={handleToggleBookMark}
-                handlePhrase={handlePhrase}
-                handleDelete={handleDelete}
-            />
+            <SearchStatus length={users.length} renderPhrase={renderPhrase}/>
+            <Users onDelete={handleDelete} onToggleBookMark={handleToggleBookMark} users={users} />
         </div>
-    )
+    );
 }
 
 export default App;
