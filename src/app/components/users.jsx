@@ -20,7 +20,7 @@ const Users = ({ users: allUsers, renderPhrase, ...rest }) => {
         setCurrentPage(1);
     }, [selectedProf]);
 
-    const handleProfessionSelect = item => {
+    const handleProfessionSelect = (item) => {
         setSelectedProf(item);
     };
 
@@ -28,8 +28,11 @@ const Users = ({ users: allUsers, renderPhrase, ...rest }) => {
         setCurrentPage(pageIndex);
     };
 
-    const filteredUsers = selectedProf ? allUsers.filter((user) => user.profession === selectedProf) : allUsers;
-    const count = filteredUsers.length;
+    const filteredUsers = selectedProf
+        ? allUsers.filter(
+            (user) => JSON.stringify(user.profession) === JSON.stringify(selectedProf))
+        : allUsers;
+    const count = filteredUsers && filteredUsers.length;
     const usersCrop = paginate(filteredUsers, currentPage, pageSize);
     const clearFilter = () => {
         setSelectedProf();
@@ -44,7 +47,12 @@ const Users = ({ users: allUsers, renderPhrase, ...rest }) => {
                         items={professions}
                         onItemSelect={handleProfessionSelect}
                     />
-                    <button className={"btn btn-secondary mt-2"} onClick={clearFilter}>Очистить</button>
+                    <button
+                        className={"btn btn-secondary mt-2"}
+                        onClick={clearFilter}
+                    >
+                        Очистить
+                    </button>
                 </div>
             )}
             <div className="d-flex flex-column">
@@ -59,12 +67,12 @@ const Users = ({ users: allUsers, renderPhrase, ...rest }) => {
                                 <th scope="col">Встретился, раз</th>
                                 <th scope="col">Оценка</th>
                                 <th scope="col">Избранное</th>
-                                <th/>
+                                <th />
                             </tr>
                         </thead>
                         <tbody>
                             {usersCrop.map((user) => (
-                                <User {...rest} {...user} key={user._id}/>
+                                <User {...rest} {...user} key={user._id} />
                             ))}
                         </tbody>
                     </table>
@@ -83,7 +91,7 @@ const Users = ({ users: allUsers, renderPhrase, ...rest }) => {
 };
 
 Users.propTypes = {
-    users: PropTypes.array.isRequired,
+    users: PropTypes.array,
     renderPhrase: PropTypes.func.isRequired
 };
 
