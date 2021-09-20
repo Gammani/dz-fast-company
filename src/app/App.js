@@ -48,12 +48,15 @@ function App() {
 
     return (
         <div>
-            <Users
-                onDelete={handleDelete}
-                onToggleBookMark={handleToggleBookMark}
-                users={users}
-                renderPhrase={renderPhrase}
-            />
+            {users && (
+                <Users
+                    onDelete={handleDelete}
+                    onToggleBookMark={handleToggleBookMark}
+                    users={users}
+                    renderPhrase={renderPhrase}
+                />
+            )
+            }
         </div>
     );
 }
