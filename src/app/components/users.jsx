@@ -7,13 +7,57 @@ import GroupList from "./groupList";
 import SearchStatus from "./searchStatus";
 import UserTable from "./usersTable";
 import _ from "lodash";
+import { useParams } from "react-router-dom";
+import UserId from "./userId";
 
-const Users = ({ users: allUsers, renderPhrase, ...rest }) => {
+const Users = () => {
     const pageSize = 8;
     const [currentPage, setCurrentPage] = useState(1);
     const [professions, setProfession] = useState();
     const [selectedProf, setSelectedProf] = useState();
     const [sortBy, setSortBy] = useState({ iter: "name", order: "asc" });
+    const [users, setUsers] = useState();
+    useEffect(() => {
+        api.users.fetchAll().then((data) => setUsers(data));
+    }, []);
+    const handleDelete = (userId) => {
+        setUsers(users.filter((user) => user._id !== userId));
+    };
+    const handleToggleBookMark = (id) => {
+        setUsers(
+            users.filter((user) => {
+                if (user._id === id) {
+                    user.bookmark = !user.bookmark;
+                    return user;
+                }
+                return user;
+            })
+        );
+        console.log(id);
+    };
+    const renderPhrase = (number) => {
+        if (number === 0) {
+            return `Никто с тобой не тусанет`;
+        }
+        const decCache = [];
+        const decCases = [2, 0, 1, 1, 1, 2];
+
+        function decOfNum(number, titles) {
+            if (!decCache[number]) {
+                decCache[number] =
+                    number % 100 > 4 && number % 100 < 20
+                        ? 2
+                        : decCases[Math.min(number % 10, 5)];
+            }
+            return titles[decCache[number]];
+        }
+
+        return decOfNum(number, [
+            `${number} человек тусанет с тобой сегодня`,
+            `${number} человека тусанут с тобой сегодня`,
+            `${number} человек тусанет с тобой сегодня`
+        ]);
+    };
 
     useEffect(() => {
         api.professions.fetchAll().then((data) => setProfession(data));
@@ -32,56 +76,123 @@ const Users = ({ users: allUsers, renderPhrase, ...rest }) => {
     const handleSort = (item) => {
         setSortBy(item);
     };
+    const params = useParams();
+    const { userId } = params;
 
-    const filteredUsers = selectedProf
-        ? allUsers.filter(
-            (user) => JSON.stringify(user.profession) === JSON.stringify(selectedProf))
-        : allUsers;
-    const count = filteredUsers.length;
-    const sortedUsers = _.orderBy(filteredUsers, [sortBy.path], [sortBy.order]);
-    const usersCrop = paginate(sortedUsers, currentPage, pageSize);
-    const clearFilter = () => {
-        setSelectedProf();
+    if (userId) {
+        return <UserId id={userId} />;
     };
+    if (users) {
+        const filteredUsers = selectedProf
+            ? users.filter(
+                (user) => JSON.stringify(user.profession) === JSON.stringify(selectedProf))
+            : users;
+        const count = filteredUsers.length;
+        const sortedUsers = _.orderBy(filteredUsers, [sortBy.path], [sortBy.order]);
+        const usersCrop = paginate(sortedUsers, currentPage, pageSize);
+        const clearFilter = () => {
+            setSelectedProf();
+        };
 
-    return (
-        <div className={"d-flex"}>
-            {professions && (
-                <div className="d-flex flex-column flex-shrink-0 p-3">
-                    <GroupList
-                        selectedItem={selectedProf}
-                        items={professions}
-                        onItemSelect={handleProfessionSelect}
-                    />
-                    <button
-                        className={"btn btn-secondary mt-2"}
-                        onClick={clearFilter}
-                    >
-                        Очистить
-                    </button>
-                </div>
-            )}
-            <div className="d-flex flex-column">
-                <SearchStatus length={count} renderPhrase={renderPhrase} />
-                {count > 0 && (
-                    <UserTable users={usersCrop} onSort={handleSort} selectedSort={sortBy} {...rest}/>
+        return (
+            <div className={"d-flex"}>
+                {professions && (
+                    <div className="d-flex flex-column flex-shrink-0 p-3">
+                        <GroupList
+                            selectedItem={selectedProf}
+                            items={professions}
+                            onItemSelect={handleProfessionSelect}
+                        />
+                        <button
+                            className={"btn btn-secondary mt-2"}
+                            onClick={clearFilter}
+                        >
+                            Очистить
+                        </button>
+                    </div>
                 )}
-                <div className="d-flex justify-content-center">
-                    <Pagination
-                        itemsCount={count}
-                        pageSize={pageSize}
-                        currentPage={currentPage}
-                        onPageChange={handlePageChange}
-                    />
+                <div className="d-flex flex-column">
+                    <SearchStatus length={count} renderPhrase={renderPhrase}/>
+                    {count > 0 && (
+                        <UserTable
+                            users={usersCrop}
+                            onSort={handleSort}
+                            selectedSort={sortBy}
+                            onDelete={handleDelete}
+                            onToggleBookMark={handleToggleBookMark}
+                        />
+                    )}
+                    <div className="d-flex justify-content-center">
+                        <Pagination
+                            itemsCount={count}
+                            pageSize={pageSize}
+                            currentPage={currentPage}
+                            onPageChange={handlePageChange}
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    }
+    return "loading...";
+    // if (users) {
+    //     const filteredUsers = selectedProf
+    //         ? users.filter(
+    //             (user) => JSON.stringify(user.profession) === JSON.stringify(selectedProf))
+    //         : users;
+    //     const count = filteredUsers.length;
+    //     const sortedUsers = _.orderBy(filteredUsers, [sortBy.path], [sortBy.order]);
+    //     const usersCrop = paginate(sortedUsers, currentPage, pageSize);
+    //     const clearFilter = () => {
+    //         setSelectedProf();
+    //     };
+    //
+    //     return (
+    //         <div className={"d-flex"}>
+    //             {professions && (
+    //                 <div className="d-flex flex-column flex-shrink-0 p-3">
+    //                     <GroupList
+    //                         selectedItem={selectedProf}
+    //                         items={professions}
+    //                         onItemSelect={handleProfessionSelect}
+    //                     />
+    //                     <button
+    //                         className={"btn btn-secondary mt-2"}
+    //                         onClick={clearFilter}
+    //                     >
+    //                         Очистить
+    //                     </button>
+    //                 </div>
+    //             )}
+    //             <div className="d-flex flex-column">
+    //                 <SearchStatus length={count} renderPhrase={renderPhrase}/>
+    //                 {count > 0 && (
+    //                     <UserTable
+    //                         users={usersCrop}
+    //                         onSort={handleSort}
+    //                         selectedSort={sortBy}
+    //                         onDelete={handleDelete}
+    //                         onToggleBookMark={handleToggleBookMark}
+    //                     />
+    //                 )}
+    //                 <div className="d-flex justify-content-center">
+    //                     <Pagination
+    //                         itemsCount={count}
+    //                         pageSize={pageSize}
+    //                         currentPage={currentPage}
+    //                         onPageChange={handlePageChange}
+    //                     />
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     );
+    // }
+    // return "loading...";
 };
 
 Users.propTypes = {
-    users: PropTypes.array.isRequired,
-    renderPhrase: PropTypes.func.isRequired
+    users: PropTypes.array,
+    renderPhrase: PropTypes.func
 };
 
 export default Users;

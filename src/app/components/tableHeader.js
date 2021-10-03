@@ -28,15 +28,9 @@ const TableHeader = ({ onSort, selectedSort, columns }) => {
                 {Object.keys(columns).map((column) => (
                     <th key={column} onClick={columns[column].path ? () => handleSort(columns[column].path) : undefined}
                         { ...{ role: columns[column].path && "button" }} scope="col">
-                        {columns[column].name}{renderSortArrow(selectedSort, columns[column].path)}
+                        {columns[column].name} {renderSortArrow(selectedSort, columns[column].path)}
                     </th>
                 ))}
-
-                {/* <th scope="col">Качества</th> */}
-                {/* <th onClick={() => handleSort("profession.name")} scope="col">Профессия</th> */}
-                {/* <th onClick={() => handleSort("completedMeetings")} scope="col">Встретился, раз</th> */}
-                {/* <th onClick={() => handleSort("rate")} scope="col">Оценка</th> */}
-                {/* <th onClick={() => handleSort("bookmark")} scope="col">Избранное</th> */}
                 <th/>
             </tr>
         </thead>
