@@ -9,6 +9,7 @@ import UserTable from "./usersTable";
 import _ from "lodash";
 import { useParams } from "react-router-dom";
 import UserId from "./userId";
+import SearchBar from "./searchBar";
 
 const UsersList = () => {
     const pageSize = 8;
@@ -17,6 +18,7 @@ const UsersList = () => {
     const [selectedProf, setSelectedProf] = useState();
     const [sortBy, setSortBy] = useState({ iter: "name", order: "asc" });
     const [users, setUsers] = useState();
+    const [searchValue, setSearchValue] = useState("");
     useEffect(() => {
         api.users.fetchAll().then((data) => setUsers(data));
     }, []);
@@ -68,6 +70,7 @@ const UsersList = () => {
 
     const handleProfessionSelect = (item) => {
         setSelectedProf(item);
+        setSearchValue("");
     };
 
     const handlePageChange = (pageIndex) => {
@@ -82,6 +85,9 @@ const UsersList = () => {
     if (userId) {
         return <UserId id={userId} />;
     };
+    const filterNamesUser = ({ name }) => {
+        return name.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1;
+    };
     if (users) {
         const filteredUsers = selectedProf
             ? users.filter(
@@ -92,6 +98,7 @@ const UsersList = () => {
         const usersCrop = paginate(sortedUsers, currentPage, pageSize);
         const clearFilter = () => {
             setSelectedProf();
+            setSearchValue("");
         };
 
         return (
@@ -113,6 +120,7 @@ const UsersList = () => {
                 )}
                 <div className="d-flex flex-column">
                     <SearchStatus length={count} renderPhrase={renderPhrase}/>
+                    <SearchBar onSearch={setSearchValue} value={searchValue} setSelectedProf={setSelectedProf}/>
                     {count > 0 && (
                         <UserTable
                             users={usersCrop}
@@ -120,6 +128,9 @@ const UsersList = () => {
                             selectedSort={sortBy}
                             onDelete={handleDelete}
                             onToggleBookMark={handleToggleBookMark}
+                            filterNamesUser={filterNamesUser}
+                            allUsers={users}
+                            searchValue={searchValue}
                         />
                     )}
                     <div className="d-flex justify-content-center">
