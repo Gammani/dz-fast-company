@@ -14,7 +14,6 @@ const UserTable = ({
     onToggleBookMark,
     onDelete,
     filterNamesUser,
-    searchValue,
     allUsers,
     ...rest
 }) => {
@@ -45,7 +44,7 @@ const UserTable = ({
         }
     };
     return (
-        <Table onSort={onSort} selectedSort={selectedSort} columns={columns} data={users} filterNamesUser={filterNamesUser} allUsers={allUsers} searchValue={searchValue}/>
+        <Table onSort={onSort} selectedSort={selectedSort} columns={columns} data={users} filterNamesUser={filterNamesUser} allUsers={allUsers}/>
     );
 };
 
@@ -56,7 +55,6 @@ UserTable.propTypes = {
     onToggleBookMark: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     filterNamesUser: PropTypes.func,
-    searchValue: PropTypes.string,
     allUsers: PropTypes.array
 };
 

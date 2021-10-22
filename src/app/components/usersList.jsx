@@ -9,16 +9,15 @@ import UserTable from "./usersTable";
 import _ from "lodash";
 import { useParams } from "react-router-dom";
 import UserId from "./userId";
-import SearchBar from "./searchBar";
 
 const UsersList = () => {
     const pageSize = 8;
     const [currentPage, setCurrentPage] = useState(1);
     const [professions, setProfession] = useState();
     const [selectedProf, setSelectedProf] = useState();
+    const [searchQuery, setSearchQuery] = useState("");
     const [sortBy, setSortBy] = useState({ iter: "name", order: "asc" });
     const [users, setUsers] = useState();
-    const [searchValue, setSearchValue] = useState("");
     useEffect(() => {
         api.users.fetchAll().then((data) => setUsers(data));
     }, []);
@@ -66,11 +65,11 @@ const UsersList = () => {
     }, []);
     useEffect(() => {
         setCurrentPage(1);
-    }, [selectedProf]);
+    }, [selectedProf, searchQuery]);
 
     const handleProfessionSelect = (item) => {
         setSelectedProf(item);
-        setSearchValue("");
+        if (searchQuery !== "") setSearchQuery("");
     };
 
     const handlePageChange = (pageIndex) => {
@@ -85,20 +84,23 @@ const UsersList = () => {
     if (userId) {
         return <UserId id={userId} />;
     };
-    const filterNamesUser = ({ name }) => {
-        return name.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1;
-    };
     if (users) {
-        const filteredUsers = selectedProf
-            ? users.filter(
-                (user) => JSON.stringify(user.profession) === JSON.stringify(selectedProf))
-            : users;
+        const filteredUsers = searchQuery
+            ? users.filter((user) => user.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1)
+            : selectedProf
+                ? users.filter(
+                    (user) => JSON.stringify(user.profession) === JSON.stringify(selectedProf))
+                : users;
         const count = filteredUsers.length;
         const sortedUsers = _.orderBy(filteredUsers, [sortBy.path], [sortBy.order]);
         const usersCrop = paginate(sortedUsers, currentPage, pageSize);
+        const handleSearchQuery = ({ target }) => {
+            setSelectedProf(undefined);
+            setSearchQuery(target.value);
+        };
         const clearFilter = () => {
             setSelectedProf();
-            setSearchValue("");
+            if (searchQuery !== "") setSearchQuery("");
         };
 
         return (
@@ -120,7 +122,13 @@ const UsersList = () => {
                 )}
                 <div className="d-flex flex-column">
                     <SearchStatus length={count} renderPhrase={renderPhrase}/>
-                    <SearchBar onSearch={setSearchValue} value={searchValue} setSelectedProf={setSelectedProf}/>
+                    <input
+                        type={"text"}
+                        placeholder={"Search..."}
+                        name={"searchQuery"}
+                        onChange={handleSearchQuery}
+                        value={searchQuery}
+                    />
                     {count > 0 && (
                         <UserTable
                             users={usersCrop}
@@ -128,9 +136,7 @@ const UsersList = () => {
                             selectedSort={sortBy}
                             onDelete={handleDelete}
                             onToggleBookMark={handleToggleBookMark}
-                            filterNamesUser={filterNamesUser}
                             allUsers={users}
-                            searchValue={searchValue}
                         />
                     )}
                     <div className="d-flex justify-content-center">
