@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
-import Pagination from "./pagination";
-import { paginate } from "../utils/paginate";
+import Pagination from "../../common/pagination";
+import { paginate } from "../../../utils/paginate";
 import PropTypes from "prop-types";
-import api from "../api";
-import GroupList from "./groupList";
-import SearchStatus from "./searchStatus";
-import UserTable from "./usersTable";
+import api from "../../../api";
+import GroupList from "../../common/groupList";
+import SearchStatus from "../../ui/searchStatus";
+import UserTable from "../../ui/usersTable";
 import _ from "lodash";
 import { useParams } from "react-router-dom";
-import UserId from "./userId";
+import UserPage from "../userPage";
 
-const UsersList = () => {
+const UsersListPage = () => {
     const pageSize = 8;
     const [currentPage, setCurrentPage] = useState(1);
     const [professions, setProfession] = useState();
@@ -82,7 +82,7 @@ const UsersList = () => {
     const { userId } = params;
 
     if (userId) {
-        return <UserId id={userId} />;
+        return <UserPage id={userId} />;
     };
     if (users) {
         const filteredUsers = searchQuery
@@ -154,9 +154,9 @@ const UsersList = () => {
     return "loading...";
 };
 
-UsersList.propTypes = {
+UsersListPage.propTypes = {
     users: PropTypes.array,
     renderPhrase: PropTypes.func
 };
 
-export default UsersList;
+export default UsersListPage;
