@@ -21,7 +21,6 @@ const Edit = () => {
     useEffect(() => {
         api.users.getById(userId).then((data) => setData(data));
     }, []);
-    console.log("data-1 = ", data);
     const handleChange = (target) => {
         setData((prevState) => ({
             ...prevState,
@@ -62,18 +61,18 @@ const Edit = () => {
         const isValid = validate();
         if (!isValid) return;
         history.push(`/users/${userId}`);
-        console.log(data);
-        console.log(qualities);
-        console.log(professions);
+    };
+    const handleBack = () => {
+        history.push(`/users/${userId}`);
     };
     useEffect(() => {
-        console.log(data);
         api.users.update(userId, data);
     }, [data]);
     const isValid = Object.keys(errors).length === 0;
     if (data) {
         return (
             <form onSubmit={handleSubmit}>
+                <button type={"button"} className={"btn btn-primary mx-auto"} onClick={handleBack}>Назад</button>
                 <div className="container mt-5">
                     <div className="row">
                         <div className="col-md-6 offset-md-3 shadow p-4">
