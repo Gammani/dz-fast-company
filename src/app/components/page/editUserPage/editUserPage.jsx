@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import api from "../api";
+import api from "../../../api";
 import { useParams, useHistory } from "react-router-dom";
-import TextField from "./common/form/textField";
-import { validator } from "../utils/validator";
-import SelectField from "./common/form/selectField";
-import RadioField from "./common/form/radioField";
-import MultiSelectField from "./common/form/multiSelectField";
+import TextField from "../../common/form/textField";
+import { validator } from "../../../utils/validator";
+import SelectField from "../../common/form/selectField";
+import RadioField from "../../common/form/radioField";
+import MultiSelectField from "../../common/form/multiSelectField";
 
-const Edit = () => {
+const EditUserPage = () => {
     const [data, setData] = useState();
     const [errors, setErrors] = useState({});
     const [qualities, setQualities] = useState({});
@@ -68,6 +68,7 @@ const Edit = () => {
     useEffect(() => {
         api.users.update(userId, data);
     }, [data]);
+    console.log(data);
     const isValid = Object.keys(errors).length === 0;
     if (data) {
         return (
@@ -114,4 +115,4 @@ const Edit = () => {
     return "loading...";
 };
 
-export default Edit;
+export default EditUserPage;
