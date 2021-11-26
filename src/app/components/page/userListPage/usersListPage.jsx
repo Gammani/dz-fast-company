@@ -9,6 +9,7 @@ import UserTable from "../../ui/usersTable";
 import _ from "lodash";
 import { useParams } from "react-router-dom";
 import UserPage from "../userPage";
+import { useUser } from "../../../hooks/useUsers";
 
 const UsersListPage = () => {
     const pageSize = 8;
@@ -17,24 +18,22 @@ const UsersListPage = () => {
     const [selectedProf, setSelectedProf] = useState();
     const [searchQuery, setSearchQuery] = useState("");
     const [sortBy, setSortBy] = useState({ iter: "name", order: "asc" });
-    const [users, setUsers] = useState();
-    useEffect(() => {
-        api.users.fetchAll().then((data) => setUsers(data));
-    }, []);
+
+    const { users } = useUser();
+    console.log(users);
     const handleDelete = (userId) => {
-        setUsers(users.filter((user) => user._id !== userId));
+        // setUsers(users.filter((user) => user._id !== userId));
+        console.log(userId);
     };
     const handleToggleBookMark = (id) => {
-        setUsers(
-            users.filter((user) => {
-                if (user._id === id) {
-                    user.bookmark = !user.bookmark;
-                    return user;
-                }
-                return user;
-            })
-        );
-        console.log(id);
+        const newArray = users.map((user) => {
+            if (user._id === id) {
+                return { ...user, bookmark: !user.bookmark };
+            }
+            return user;
+        });
+        // setUsers(newArray);
+        console.log(newArray);
     };
     const renderPhrase = (number) => {
         if (number === 0) {
